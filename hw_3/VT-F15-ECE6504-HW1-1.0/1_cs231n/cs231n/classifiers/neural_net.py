@@ -104,10 +104,10 @@ def two_layer_net(X, model, y=None, reg=0.0):
   #############################################################################
   e_scores = np.exp(scores - np.max(scores))
   p = e_scores / np.sum(e_scores, axis=1, keepdims=True)
-  corss_entropy_loss = np.sum(-np.log(p[range(N), y])) / N
+  data_loss = np.sum(-np.log(p[range(N), y])) / N
 
-  l2_reg = reg * 0.5 * (np.sum(np.square(W1)) + np.sum(np.square(W2)))
-  loss = corss_entropy_loss + l2_reg
+  reg_loss = reg * 0.5 * (np.sum(np.square(W1)) + np.sum(np.square(W2)))
+  loss = data_loss + reg_loss
   #############################################################################
   #                              END OF YOUR CODE                             #
   #############################################################################
@@ -119,15 +119,15 @@ def two_layer_net(X, model, y=None, reg=0.0):
   # and biases. Store the results in the grads dictionary. For example,       #
   # grads['W1'] should store the gradient on W1, and be a matrix of same size #
   #############################################################################
-  d_output = p
-  d_output[range(N), y] -= 1
-  d_output /= N
-  grads['W2'] = np.dot(y1.T, d_output)
-  grads['b2'] = np.sum(d_output, axis=0)
-  d_hidden = np.dot(d_output, W2.T)
-  d_hidden[y1 < 0] = 0
-  grads['W1'] = np.dot(X.T, d_hidden)
-  grads['b1'] = np.sum(d_hidden, axis=0)
+  d_scores = p
+  d_scores[range(N), y] -= 1
+  d_scores /= N
+  grads['W2'] = np.dot(y1.T, d_scores)
+  grads['b2'] = np.sum(d_scores, axis=0)
+  dW = np.dot(d_scores, W2.T)
+  dW[y1 < 0] = 0
+  grads['W1'] = np.dot(X.T, dW)
+  grads['b1'] = np.sum(dW, axis=0)
   grads['W2'] += reg * W2
   grads['W1'] += reg * W1
   #############################################################################
