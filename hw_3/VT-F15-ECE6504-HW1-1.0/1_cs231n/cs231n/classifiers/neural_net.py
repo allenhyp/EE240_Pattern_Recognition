@@ -124,10 +124,11 @@ def two_layer_net(X, model, y=None, reg=0.0):
   d_scores /= N
   grads['W2'] = np.dot(y1.T, d_scores)
   grads['b2'] = np.sum(d_scores, axis=0)
-  dW = np.dot(d_scores, W2.T)
-  dW[y1 < 0] = 0
-  grads['W1'] = np.dot(X.T, dW)
-  grads['b1'] = np.sum(dW, axis=0)
+  
+  d_hidden = np.dot(d_scores, W2.T)
+  d_hidden[y1 <= 0] = 0
+  grads['W1'] = np.dot(X.T, d_hidden)
+  grads['b1'] = np.sum(d_hidden, axis=0)
   grads['W2'] += reg * W2
   grads['W1'] += reg * W1
   #############################################################################
