@@ -66,7 +66,7 @@ class ClassifierTrainer(object):
     train_acc_history = []
     val_acc_history = []
     for it in range(num_iters):
-      if it % 10 == 0:  print('starting iteration ', it)
+      if it % 500 == 0:  print('starting iteration ', it)
 
       # get batch of data
       if sample_batches:
@@ -97,7 +97,7 @@ class ClassifierTrainer(object):
           # step_cache[p] and the momentum strength is stored in momentum.    #
           # Don't forget to also update the step_cache[p].                    #
           #####################################################################
-          dx = momentum * self.step_cache[p] + learning_rate * grads[p]
+          dx = momentum * self.step_cache[p] - learning_rate * grads[p]
           self.step_cache[p] = dx
           #####################################################################
           #                      END OF YOUR CODE                             #
