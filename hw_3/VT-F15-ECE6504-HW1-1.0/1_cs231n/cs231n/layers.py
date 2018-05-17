@@ -1,4 +1,5 @@
 import numpy as np
+# from im2col import im2col_indices
 
 def affine_forward(x, w, b):
   """
@@ -145,19 +146,23 @@ def conv_forward_naive(x, w, b, conv_param):
   H_out, W_out = int(H_out), int(W_out)
   out = np.zeros((N, F, H_out, W_out))
 
+  # x_cols = im2col_indices(x, HH, WW, padding=pad, stride=stride)
+  # w_cols = w.reshape(N, -1)
+  # print w_cols.shape
+  # out = (w_cols @ x_cols) + b
+  # out = out.reshape(F, H_out, W_out, N)
+  # out = out.transpose(3, 0, 1, 2)
   for n in xrange(N):
-    x_padded = np.pad(x[n, :, :, :], ((0, 0), (pad, pad), (pad, pad)), 'constant')
+    x_padded = np.pad(x[n,:,:,:], ((0, 0),(pad, pad),(pad, pad)), 'constant')
     for f in xrange(F):
       for ho in xrange(H_out):
         for wo in xrange(W_out):
-          h1 = H_out * stride
+          h1 = ho * stride
           h2 = h1 + HH
-          w1 = W_out * stride
+          w1 = wo * stride
           w2 = w1 + WW
           window = x_padded[:, h1:h2, w1:w2]
-          print(x_padded.shape, h1, h2)
-          out[n, f, ho, wo] = np.sum(window * w[f, :, :, :]) + b[f]
-
+          out[n, f, ho, wo] = np.sum(window * w[f,:,:,:]) + b[f]
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
