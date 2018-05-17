@@ -293,8 +293,6 @@ def max_pool_backward_naive(dout, cache):
         for c in xrange(C):
           dx[n, c, max_rows[n, c], max_cols[n, c]] += dout[n, c, ii, jj]
 
-  dx = dx.reshape(N, C, H, W)
-
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
