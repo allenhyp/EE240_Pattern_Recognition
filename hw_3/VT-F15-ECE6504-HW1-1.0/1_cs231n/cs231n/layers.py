@@ -240,7 +240,21 @@ def max_pool_forward_naive(x, pool_param):
   #############################################################################
   # TODO: Implement the max pooling forward pass                              #
   #############################################################################
-  pass
+  (N, C, H, W) = x.shape
+  ph, pw, stride = pool_param['pool_height'], pool_param['pool_width'], pool_param['stride']
+  H_out = 1 + (H - ph) / stride
+  W_out = 1 + (W - pw) / stride
+  out = np.zeros((N, C, H_out, W_out))
+
+  for n in xrange(N):
+    for h in xrange(H_out):
+      for w in xrange(W_out):
+        h1 = h * stride
+        h2 = h1 + ph
+        w1 = w * stride
+        w2 = w1 + pw
+        window = x[n, :, h1:h2, w1:w2]
+        out[n, :, h, w] = np.max(window.reshape((C, ph * pw)), axis=1)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -263,7 +277,24 @@ def max_pool_backward_naive(dout, cache):
   #############################################################################
   # TODO: Implement the max pooling backward pass                             #
   #############################################################################
-  pass
+  (x, pool_param) = cache
+  (N, C, H, W) = x.shape
+  ph, pw, stride = pool_param['pool_height'], pool_param['pool_width'], pool_param['stride']
+  H_out = 1 + (H - ph) / stride
+  W_out = 1 + (W - pw) / stride
+  dx = np.zeros_like(x)
+
+  for ii, i in enumerate(xrange(0, H, stride)):
+    for jj, j in enumerate(xrange(0, W, stride)):
+      max_index = np.argmax(x[:, :, i:i+ph, j:j+pw].reshape(N, C, -1), axis=2)
+      max_cols = np.remainder(max_index, pw) + j
+      max_rows = max_index / pw + i
+      for n in xrange(N):
+        for c in xrange(C):
+          dx[n, c, max_rows[n, c], max_cols[n, c]] += dout[n, c, ii, jj]
+
+  dx = dx.reshape(N, C, H, W)
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
